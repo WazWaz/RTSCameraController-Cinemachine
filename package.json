@@ -1,0 +1,20 @@
+{
+    "name": "com.example.rtscameratargetcontroller",
+    "version": "1.1.1",
+    "displayName": "RTSCameraTargetController",
+    "description": "This project is a Camera Controller for RTS style games. It works by adding the script to a Gameobject and placing references for the Virtual Camera and the Target itself. The script controlls the Target and the Virtual Camera.",
+    "unity": "2019.1",
+    "unityRelease": "0f0",
+    "dependencies": {
+        "com.unity.ugui": "1.0.0"
+    },
+    "keywords": [
+        "RTS",
+        "Camera",
+        "Cinamachine"
+    ],
+    "author": {
+        "name": "Nickk888",
+        "url": "https://github.com/Nickk888SAMP"
+    }
+}
