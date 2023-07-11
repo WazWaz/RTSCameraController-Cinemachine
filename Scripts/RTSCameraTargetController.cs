@@ -13,6 +13,10 @@ public class RTSCameraTargetController : MonoBehaviour
     [SerializeField] [Tooltip("The target for the camera to follow.")]
     private Transform cameraTarget;
 
+    [SerializeField]
+    [Tooltip("The bounds confining the camera target")]
+    private Bounds cameraTargetPositionBounds = new Bounds(Vector3.zero, new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity));
+
     [Space] [Header("Time Scale")]
     [SerializeField] [Tooltip("Check to make the controller be independent on the Time Scale.")]
     private bool independentTimeScale = true;
@@ -112,6 +116,12 @@ public class RTSCameraTargetController : MonoBehaviour
     private Transform lockedOnTransform;
     private bool hardLocked;
     private float lockedOnZoom;
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(cameraTargetPositionBounds.center, cameraTargetPositionBounds.size);
+    }
 
     private void Awake()
     {
@@ -347,8 +357,8 @@ public class RTSCameraTargetController : MonoBehaviour
         camForward.Normalize();
         camRight.Normalize();
         Vector3 relativeDir = (camForward * direction.z) + (camRight * direction.x);
-
-        cameraTarget.Translate(relativeDir * (relativeZoomCameraMoveSpeed * speed) * GetTimeScale());
+        var newPosition = cameraTarget.position + (relativeDir * (relativeZoomCameraMoveSpeed * speed) * GetTimeScale());
+        cameraTarget.position = cameraTargetPositionBounds.ClosestPoint(newPosition);
     }
 
     private float GetTimeScale()
