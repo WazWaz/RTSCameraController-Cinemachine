@@ -43,8 +43,8 @@ public class RTSCameraTargetController : MonoBehaviour
     [SerializeField]
     private float cameraMouseSpeed = 2.0f;
 
-    [SerializeField]
-    private float cameraRotateSpeed = 4.0f;
+    [SerializeField] [Tooltip("The horizontal and vertical rotation (tilt) speed. Use negative values to reverse direction.")]
+    private Vector2 cameraRotateSpeed = new Vector2(4.0f, 4.0f);
 
     [SerializeField]
     private float cameraKeysSpeed = 6.0f;
@@ -320,14 +320,14 @@ public class RTSCameraTargetController : MonoBehaviour
                 if (horizontalMouse != 0)
                 {
                     currentRotateDir = (horizontalMouse > 0 ? true : false);
-                    currentCameraRotate += horizontalMouse * cameraRotateSpeed;
+                    currentCameraRotate += horizontalMouse * cameraRotateSpeed.x;
                     virtualCameraGameObject.transform.eulerAngles = new Vector3(virtualCameraGameObject.transform.eulerAngles.x, currentCameraRotate, 0);
                     if (rotateCameraCanvasGameObject != null)
                         rotateCameraCanvasGameObject.transform.rotation = Quaternion.Euler(rotateCameraCanvasGameObject.transform.eulerAngles.x, rotateCameraCanvasGameObject.transform.eulerAngles.y, virtualCameraGameObject.transform.eulerAngles.y * (currentRotateDir ? 1 : -1));
                 }
                 if (verticalMouse != 0 && allowTiltRotate)
                 {
-                    currentCameraTilt += verticalMouse * cameraRotateSpeed;
+                    currentCameraTilt += verticalMouse * cameraRotateSpeed.y;
                     currentCameraTilt = Mathf.Clamp(currentCameraTilt, cameraTiltMinMax.x, cameraTiltMinMax.y);
                     virtualCameraGameObject.transform.eulerAngles = new Vector3(currentCameraTilt, virtualCameraGameObject.transform.eulerAngles.y, 0);
                 }

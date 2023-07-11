@@ -1124,7 +1124,7 @@ MonoBehaviour:
   allowScreenSideMove: 1
   cameraTiltMinMax: {x: 15, y: 75}
   cameraMouseSpeed: 2
-  cameraRotateSpeed: 4
+  cameraRotateSpeed: {x: 4, y: 4}
   cameraKeysSpeed: 6
   cameraZoomSpeed: 4
   cameraMoveDeadZone: 5
