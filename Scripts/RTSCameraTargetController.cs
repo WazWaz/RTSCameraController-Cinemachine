@@ -54,6 +54,9 @@ public class RTSCameraTargetController : MonoBehaviour
     private float cameraKeysSpeed = 6.0f;
 
     [SerializeField]
+    private float cameraKeysSpeedFast = 12.0f;
+
+    [SerializeField]
     private float cameraZoomSpeed = 4f;
 
     [SerializeField]
@@ -229,7 +232,8 @@ public class RTSCameraTargetController : MonoBehaviour
             if (vectorChange != Vector3.zero)
             {
                 CancelTargetLock();
-                MoveTargetRelativeToCamera(vectorChange, cameraKeysSpeed);
+                MoveTargetRelativeToCamera(vectorChange,
+                    Input.GetKey(KeyCode.LeftShift) ? cameraKeysSpeedFast : cameraKeysSpeed);
             }
         }
     }
