@@ -37,11 +37,15 @@ public class ObjectSelector : MonoBehaviour
                 {
                     if(hit.transform.gameObject.GetComponent<MoveToRandomPosition>() == null)
                     {
-                        cameraTargetController.LockOnTarget(hit.transform.position, 10);
+                        cameraTargetController.lockOnZoom = 10;
+                        cameraTargetController.hardLock = false;
+                        cameraTargetController.LockOnTarget(hit.transform.position);
                     }
                     else
                     {
-                        cameraTargetController.LockOnTarget(hit.transform, 20, true);
+                        cameraTargetController.lockOnZoom = 20;
+                        cameraTargetController.hardLock = true;
+                        cameraTargetController.LockOnTarget(hit.transform);
                     }
                 }
             }

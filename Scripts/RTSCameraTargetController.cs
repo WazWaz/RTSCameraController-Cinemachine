@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Cinemachine;
+using UnityEngine.Events;
 
 public class RTSCameraTargetController : MonoBehaviour
 {
@@ -80,6 +81,12 @@ public class RTSCameraTargetController : MonoBehaviour
     private Vector2 cameraZoomMinMax = new Vector2(5, 100);
 
     [Space]
+    [Header("Target Locking")]
+    public bool hardLock = false;
+    public float lockOnZoom = 2;
+    public bool zoomCancelsLock = true;
+
+    [Space]
     [SerializeField] [Header("Camera Zoom Slider (Optional)")]
     private Slider cameraZoomSlider;
 
@@ -114,12 +121,10 @@ public class RTSCameraTargetController : MonoBehaviour
     private bool isDragging;
     private bool isSideZoneMoving;
     private bool isLockedOnTarget;
+    private bool zoomingLock;
 
     private Vector3 lockedOnPosition;
     private Transform lockedOnTransform;
-    private bool hardLocked;
-    private float lockedOnZoom;
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
@@ -180,7 +185,7 @@ public class RTSCameraTargetController : MonoBehaviour
         {
             if(lockedOnTransform == null)
             {
-                if(hardLocked)
+                if(hardLock)
                 {
                     cameraTarget.position = lockedOnPosition;
                 }
@@ -191,7 +196,7 @@ public class RTSCameraTargetController : MonoBehaviour
             }
             else
             {
-                if(hardLocked)
+                if(hardLock)
                 {
                     cameraTarget.position = lockedOnTransform.position;
                 }
@@ -200,7 +205,9 @@ public class RTSCameraTargetController : MonoBehaviour
                     cameraTarget.position = Vector3.Lerp(cameraTarget.position, lockedOnTransform.position, targetLockSpeed * GetTimeScale());
                 }
             }
-            currentCameraZoom = Mathf.Lerp(currentCameraZoom, lockedOnZoom, targetLockSpeed * GetTimeScale());
+            if (zoomingLock) {
+                currentCameraZoom = Mathf.Lerp(currentCameraZoom, lockOnZoom, targetLockSpeed * GetTimeScale());
+            }
         }
     }
 
@@ -295,7 +302,10 @@ public class RTSCameraTargetController : MonoBehaviour
             currentCameraZoom = Mathf.Clamp(currentCameraZoom, cameraZoomMinMax.x, cameraZoomMinMax.y);
             if(Input.mouseScrollDelta.y != 0)
             {
-                CancelTargetLock();
+                if (zoomCancelsLock)
+                    CancelTargetLock();
+                else
+                    zoomingLock = false;
             }
         }
         framingTransposer.m_CameraDistance = Mathf.SmoothDamp(framingTransposer.m_CameraDistance, currentCameraZoom, ref cameraZoomSmoothDampVel_ref, (cameraZoomSmoothTime / 100), Mathf.Infinity, GetTimeScale());
@@ -401,38 +411,40 @@ public class RTSCameraTargetController : MonoBehaviour
     /// <summary>
     /// Locks the camera to a target position
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="zoomFactor"></param>
         
-    public void LockOnTarget(Vector3 position, float zoomFactor, bool hardLock = false)
+    public void LockOnTarget(Vector3 position)
     {
-        CancelTargetLock();
+        CancelTargetLockNoEvent();
         lockedOnPosition = position;
-        lockedOnZoom = zoomFactor;
-        hardLocked = hardLock;
         isLockedOnTarget = true;
+        zoomingLock = true;
     }
 
     /// <summary>
     /// Locks the camera to a target transform
     /// </summary>
-    /// <param name="transform"></param>
-    /// <param name="zoomFactor"></param>
 
-    public void LockOnTarget(Transform transform, float zoomFactor, bool hardLock = false)
+    public void LockOnTarget(Transform transform)
     {
-        CancelTargetLock();
+        CancelTargetLockNoEvent();
         lockedOnTransform = transform;
-        lockedOnZoom = zoomFactor;
-        hardLocked = hardLock;
-        isLockedOnTarget = true;
+        isLockedOnTarget = transform != null;
+        zoomingLock = true;
     }
+
+    public UnityEvent OnTargetLockCancel;
 
     /// <summary>
     /// Cancels the target locking
     /// </summary>
 
     public void CancelTargetLock()
+    {
+        CancelTargetLockNoEvent();
+        OnTargetLockCancel.Invoke();
+    }
+
+    private void CancelTargetLockNoEvent()
     {
         isLockedOnTarget = false;
         lockedOnPosition = Vector3.zero;
